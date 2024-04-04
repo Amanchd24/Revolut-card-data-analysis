@@ -1,28 +1,538 @@
 ---
 title: "Assignment3"
+bibliography: "reference/References.bib"
+author: "Amandeep Manchanda 23104862 "
 format: 
   html:
+    code-fold: true
     embed-resources: true
 editor: visual
+toc: true
 ---
 
-## Assignment 3
+## Introduction
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+In below task consumer behavior is analysed w.r.t to their spending habit with the use of card. For this analysis three main datasets selected Ireland card spending which also include spending levels in different county, UK monthly spending report by Bank of England and lastly spending via Revolut report released by Bank of England.
 
-## Test 1 with github
+## Datasets Description
 
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+Data are collected from payment service providers (PSPs) and payment system operators (PSOs) resident in the Republic of Ireland. PSPs include banks, credit unions, payment institutions and e-money institutions, while PSOs manage the systems that facilitate funds transfers between PSPs. The statistics can be used to identify trends in payments and are essential in helping policymakers take well-informed decisions, as well as identifying and monitoring developments in the payments markets within the EU, and for assisting in the promotion of the smooth operation of payment systems. Data contains number as well as value of transactions through various medium including debit cards.[@centralbankPaymentStatistics]
 
-```{r}
-1 + 1
-```
+Daily, weekly and monthly data showing seasonally adjusted and non-seasonally adjusted UK spending using debit and credit cards. These are official statistics in development. In our analysis we used monthly data. Source: CHAPS, Bank of England.[@onsSpendingCredit]
 
-You can add options to executable code like this
+Weekly and monthly data showing indices of Revolut debit card transaction data, UK. These are official statistics in development. Source: Revolut [@onsRevolutSpending]
 
-```{r}
+```{r,results = 'hide'}
 #| echo: false
-2 * 2
+options(repos = c(CRANmirror = "https://cran.r-project.org/"))
+suppressMessages(suppressWarnings({
+    install.packages("readr")
+    install.packages("tidyverse")
+    install.packages("Hmisc")
+    install.packages("dplyr")
+    install.packages("reshape2")
+    install.packages("lattice")
+    install.packages("ggplot2")
+    install.packages("caret")
+    install.packages("MLmetrics")
+    install.packages("yardstick")
+    install.packages("ranger")
+    install.packages("plotly")
+    install.packages("lubridate")
+    install.packages("quantmod")
+    install.packages("tidytext")
+    install.packages("tm")
+    install.packages("wordcloud")
+    install.packages("RColorBrewer")
+    install.packages("pdftools")
+    install.packages("NLP")
+    install.packages("tidyr")
+    install.packages("sf")
+    library(sf)
+    install.packages("giscoR")
+    library(giscoR)
+    library(NLP)
+    library(pdftools)
+    library(RColorBrewer)
+    library(tm)
+    library(wordcloud)
+    library(ranger)
+    library(caret)
+    library(pROC)
+    library(dplyr)
+    library(readr)
+    library(tidyverse)
+    library(reshape2)
+    library(tidyr)
+    library(viridis)
+    library(plotly)
+    library(lubridate)
+    library(quantmod)
+    library(tidytext)
+    library(tidyr)
+    library(ggplot2)
+    install.packages("leaflet")
+    library(leaflet)
+    
+}))
+
+
+
 ```
 
-The `echo: false` option disables the printing of code (only output is displayed).
+## Data import and Joining dataset
+
+First we read csv files in R and then we had joined the UK monthly data with Revolut UK monthly data to analyse how consumer spend on revolut and won which category they spend most via card. Both csv files inner joined by taking "Month" column as common. category name_r denots category of Revolut dataset.
+
+```{r}
+#Read CSV file and assigning variable to dataset
+ukdata <- read.csv("ukdatamonthly.csv",header = TRUE) #UK Data
+iedata <- read.csv("Valuespentcatwise_ie.csv",header = TRUE) #Ireland data Monthly
+revolut<-read.csv("revolut.csv",header = TRUE) #Revolut data for UK Monthly
+
+ukdata1 <- na.omit(ukdata) #Omit any NA value in data
+
+#Copy of ukdata1
+ukdata_join<-ukdata1
+
+#Converting Month column of both data in same format
+ukdata_join$Month <- dmy(paste0("01-", ukdata_join$Month))
+revolut$Month_r <- dmy(paste0("01 ", revolut$Month_r))
+
+ukdata_join$Month <- format(ukdata_join$Month, "%Y-%m")
+revolut$Month_r <- format(revolut$Month_r, "%Y-%m")
+
+library(dplyr)
+
+# Inner join on "Month" column
+joined_data <- inner_join(ukdata_join, revolut, by = c("Month" = "Month_r"))
+
+head(joined_data, 10) #To view datset
+
+sum(is.null(joined_data))
+
+```
+
+## Time series graph of joined datset
+
+Spending on Fuel with Revolut, Staple spending by bank debit card and aggregate are plotted. The mentioned column of datasets are plotted with time on X-axis and column value (Index value w.r.t Feb 2020, 100) on Y-axis. Interactive scatter graph plotted by use of plotly package. Graph shows that percentage increase as comparison to Feb'20 value.
+
+Output graph shows consumers spend more on fuel with Revolut card as compasrison to bank debit card on staple items.
+
+```{r}
+# Creating dataframe of column to plot
+df <- data.frame(x = joined_data$Month, #X-axis month
+                  y = joined_data$Fuel_r, # Revolut Fuel Col
+                  a = joined_data$Aggregate, #Aggregate col
+                  s = joined_data$Staple)  # Staple column
+
+# Creating steps for slider (with color-trace visibility correspondence)
+steps <- list(
+  list(args = list("visible", c(TRUE, FALSE, FALSE)),  # Show Fuel_r (green)
+       label = "Green",
+       method = "restyle",
+       value = "1"
+  ),
+  list(args = list("visible", c(FALSE, TRUE, FALSE)),  # Show Aggregate (blue)
+       label = "Blue",
+       method = "restyle",
+       value = "2"
+  ),
+  list(args = list("visible", c(FALSE, FALSE, TRUE)),  # Show Staple (red)
+       label = "Red",
+       method = "restyle",
+       value = "3"
+  )
+)
+
+# Create the plot with initial visibility set for Fuel_r
+fig <- plot_ly(df,
+               x = ~x, y = ~y,
+               mode = "markers",
+               marker = list(size = 10, color = 'green'),  # Initial green color
+               type = "scatter",
+               name = "Fuel_r") %>%  # Set name for first trace (Fuel_r)
+       add_trace(x = ~x, y = ~a,
+                 mode = "markers",
+                 marker = list(size = 10, color = 'blue'),  # Initial blue color (hidden)
+                 type = "scatter",
+                 name = "Aggregate",  # Set name for second trace (Aggregate)
+                 visible = FALSE) %>%
+       add_trace(x = ~x, y = ~s,
+                 mode = "markers",
+                 marker = list(size = 10, color = 'red'),  # Initial red color (hidden)
+                 type = "scatter",
+                 name = "Staple",  # Set name for third trace (Staple)
+                 visible = FALSE)  # Initially hidden
+
+# Customize layout with slider and legend
+fig <- fig %>% layout(title = "Spending on Fuel by revolut, Aggregate & Staple",
+                       sliders = list(
+                         list(
+                           active = 1,  # Initially show Fuel_r (green)
+                           currentvalue = list(prefix = "Color: "),
+                           pad = list(t = 60),
+                           steps = steps
+                         )
+                       ),
+                       legend = list(title = "Data")  # Add legend title
+                   )
+
+fig
+
+
+
+```
+
+## Mermaid Dataflow diagram of Joined dataset.
+
+To join both dataset inner join is used. Month column and Month_r of 'Revolut' dataset column are kept as common and resulting in Month column and all other column of both datasets.
+
+```{mermaid}
+graph TD;
+    A(Ukdata) --> B{na.omit}
+    B -->|Output| C(Ukdata1)
+    C --> D(Ukdata_join)
+    D --> E{dmy}
+    E -->|Output| F(Ukdata_join)
+    G(Revolut)
+    G --> H{dmy}
+    H -->|Output| I(Revolut)
+    I --> J{format}
+    J -->|Output| K(Revolut)
+    F --> L{format}
+    L -->|Output| M(Ukdata_join)
+    N --> O(Joined_data)
+    K -->|Joining using 'Month_r'| N{Inner Join}
+    M -->|Joining using 'Month'| N{Inner Join}
+```
+
+## Text analysis of .txt file.
+
+The biggest GTC conference yet, NVIDIA founder and CEO Jensen Huang unveils NVIDIA Blackwell, NIM micro services, Omni verse Cloud APIs and more.Generative AI promises to revolutionize every industry it touches — all that’s been needed is the technology to meet the challenge.
+
+To analyse the text of NIVIDIA CEO speech we copied the speech text in text file and analyse the frequency of words used in speech. This text analysis utilized to create the summary or emotion of speech by getting the most used words.
+
+[@nvidiaCreatedProcessor]
+[@tidytextminingWelcomeText]
+
+```{r}
+suppressWarnings(
+text <- readLines("AI.txt"))
+
+text_df <- tibble(text = text) %>%
+  unnest_tokens(word, text)
+
+word_counts <- text_df %>%
+  count(word, sort = TRUE)
+
+top_words <- head(word_counts, 10)  # Get the top 10 most frequent words
+
+ggplot(top_words, aes(x = reorder(word, n), y = n)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Word", y = "Frequency") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Rotate x-axis labels for better readability
+
+```
+
+## Text Analysis of .pdf article on debit card usage in US.
+
+Debit card use at the point of sale has grown dramatically in recent years in the United States and now exceeds the number of credit card transactions. However, many questions remain regarding patterns of debit card use, consumer preferences when using debit, and how consumers might respond to explicit pricing of card transactions. Using a new nationally representative consumer survey, this paper describes the current use of debit cards by U.S. consumers, including how demographics affect use
+
+[@borzekowski2008consumers]
+
+```{r}
+
+# Read PDF file
+pdf_text <- pdf_text("dcuse.pdf")
+
+# Create a Corpus
+corpus <- Corpus(VectorSource(pdf_text))
+
+# Preprocess the text by removing numbers, punctuation and space
+suppressWarnings(corpus <- tm_map(corpus, content_transformer(tolower)))
+suppressWarnings(corpus <- tm_map(corpus, removePunctuation))
+suppressWarnings(corpus <- tm_map(corpus, removeNumbers))
+suppressWarnings(corpus <- tm_map(corpus, removeWords, stopwords("en")))
+suppressWarnings(corpus <- tm_map(corpus, stripWhitespace))
+
+# Create a document-term matrix
+dtm <- DocumentTermMatrix(corpus)
+
+# Convert the document-term matrix to a matrix
+mat <- as.matrix(dtm)
+
+# Calculate word frequencies
+word_freq <- colSums(mat)
+
+# Create a word cloud
+wordcloud(names(word_freq), word_freq, min.freq = 15, random.order = FALSE, colors = brewer.pal(8, "Dark2"))
+
+
+```
+
+The most used words in research paper is debit, usage, payment, households, credit and consumer.
+
+## Ireland data analysis (Interactive Line graph)
+
+Ireland data taken from central bank of Ireland website which contains data regarding debit card and other digital usage in various county and for various categories.
+
+In below analysis Bar plot is plotted for each month showing cumulative spend on cards in that month for various categories.
+
+```{r}
+
+#Modify the format of Month column
+iedata$Month <- as.Date(paste0(iedata$Month, "-01"), format="%b-%y-%d")
+
+#Assigning column to category and values to Values_to
+iedata2 <- pivot_longer(iedata, -Month, names_to = "Category", values_to = "Value")
+
+#Import library
+library(viridis)
+
+#GGplot for month and cummulative spend amount for categories.
+ggplot(iedata2, aes(x = Month, y = Value, fill = Category)) + 
+  geom_bar(stat = "identity", position = "stack") +
+  scale_fill_viridis_d(option = "inferno") +
+  theme_minimal() +
+  labs(title = "Commulative Spend values ", x = "Month", y = "Value") +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b-%y") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+
+```
+
+### Interactive line graph for each category
+
+In below graph line graph is plotted for each category over time period. It shows trend in spending by card which are different in various months. Trend depends upon holidays season, festival months and like in education category mostly card used in September due to starting of academic sessions in various educational institutes.
+
+By use of interactive graph it is easy to compare categories with each another and also to do trend analysis of individual categories.
+
+```{r}
+#copy data to iedata3
+iedata3 <-iedata2
+
+#change format of month to yyyy-mm-dd
+iedata3$Month <- as.Date(iedata3$Month, format = "%Y-%m-%d")
+num_categories <- length(unique(iedata3$Category))
+
+colors <- RColorBrewer::brewer.pal(min(num_categories, 8), "Dark2")
+
+# Create a plot with the ability to toggle categories on and off
+fig <- plot_ly(data = iedata2, type = 'scatter', mode = 'lines+markers',
+               x = ~Month, y = ~Value,
+               color = ~Category, colors = colors) %>%
+  layout(
+    title = 'Category Values Over Time',
+    xaxis = list(
+      title = 'Month',
+      type = 'date',
+      tickformat = '%b-%y'
+    ),
+    yaxis = list(title = 'Value'),
+    hovermode = 'closest'
+  )
+
+# Customize legend to toggle traces
+fig <- fig %>% layout(legend = list(itemclick = "toggleothers", itemdoubleclick = "toggle"))
+
+fig
+
+```
+
+### Choropleth map of Ireland (card usage value in various regions)
+
+The Nomenclature of Territorial Units for Statistics (NUTS) were created by Eurostat in order to define territorial units for the production of regional statistics across the European Union. In 2003 the NUTS classification was established within a legal framework (Regulation (EC) No 1059/2003).
+
+As the administrative territorial breakdown of EU Member States is the basis of the NUTS classification, changes made under the 2014 Local Government Act prompted a revision to the Irish NUTS 2 and NUTS 3 Regions.
+
+!["Image of Nuts"](images/nuts.png){width="100%" height="60%"}
+
+[@CentralStatisticsOffice]CentralStatisticsOffice
+
+NUTS 3 Nomenclature is used for to plot the card spend values combined in various county combined according to NUTS 3 eight regions.
+
+It is shown in map that IE061 Dublin have most amount of spending by card as comparison to other regions.
+
+```{r}
+
+year_ref <- 2021
+
+nuts3_IT <- gisco_get_nuts(
+  year = year_ref,
+  resolution = 20, 
+  nuts_level = 3,
+  country = "Ireland") %>%
+  select(NUTS_ID, NAME_LATN)
+
+
+map<-read.csv("mapnew1.csv")
+
+nuts3_IT_data <- nuts3_IT %>%
+  left_join(map, by = c("NUTS_ID" = "Nuts"))
+
+plot(nuts3_IT_data[, "Observation_Value"],
+     breaks = "jenks",
+     main = "Choropleth map of spending by card in different regions (in Mill.)")
+text(st_coordinates(nuts3_IT_data), labels = nuts3_IT_data$NUTS_ID, cex = 0.8, pos = 3)
+
+
+```
+
+## Leaflet map of spending by card in Ireland
+
+we don't have a GeoJSON file with boundaries for Irish counties, we cannot create a choropleth in leaflet map directly.
+
+So, by taking lat long of county of Ireland we plot overall card payment done by customer in a given year. Dublin tops the chart with 90 million Euro spend by card payment in a given time period.
+
+```{r}
+
+map<-read.csv("map.csv")
+map$Long <- as.numeric(map$Long)
+map$Lat <- as.numeric(map$Lat)
+
+
+# Create leaflet map
+m <- leaflet(data = map) %>%
+  addTiles() %>%
+  addCircleMarkers(
+    ~Long, ~Lat, 
+    popup = ~paste("Geographical Description: ", Geographical_Description, "<br>",
+                   "Observation Value: ", Observation_Value),
+    radius = ~sqrt(Observation_Value) * 5,  # Adjust the size of markers based on Observation_Value
+    color = "red",
+    fillOpacity = 0.5
+  ) %>%
+  addLegend(position = "bottomright", 
+            colors = "red", 
+            labels = "Observation Value",
+            opacity = 1)
+
+# Display the map
+m
+
+```
+
+## UK Dataset of card payment
+
+UK spending using debit and credit cards. These are official statistics in development. Source: CHAPS, Bank of England Index: February 2020 = 100, non-seasonally adjusted, nominal prices
+
+1.  staple' refers to companies that sell essential goods that households need to purchase, such as food and utilities
+2.  'work-related' refers to companies providing public transport or selling petrol
+3.  'delayable' refers to companies selling goods whose purchase could be delayed, such as clothing or furnishings
+4.  'social' refers to spending on travel and eating out
+
+```{r}
+
+#Changing format of Month column
+ukdata1$Month <- as.Date(paste0(ukdata1$Month, "-01"), format="%b-%y-%d")
+#Making categories
+ukdata2 <- pivot_longer(ukdata1, -Month, names_to = "Category", values_to = "Value")
+
+#Establishing start and end date month column
+start_date <- min(ukdata2$Month, na.rm = TRUE)
+end_date <- max(ukdata2$Month, na.rm = TRUE)
+
+#Plot for category in UK 
+ggplot(ukdata2, aes(x = Month, y = Value, color = Category, group = Category)) +
+  geom_line() +
+  theme_minimal() +
+  labs(title = "Index Values Over Time", x = "Month", y = "Value") +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b %Y") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+Staple category in UK has most stable trend means there is no seasonal effect on staple category. Consumers throughout the year spend approximate value on this category by card.
+
+Work related category seen a increase over the years with some variations in a single year. Means consumers increasingly using card by every year in work related activities.
+
+In covid-19 time period in March 2020 to May 2020 due to movement restrictions social category spending shows a huge decrease of card spending. After that time period it gradually increase.
+
+## Linear Regression model on UK data
+
+```{r}
+
+# Create separate linear regression models for each category
+lm_models <- lapply(names(ukdata1)[2:ncol(ukdata1)], function(category) {
+  lm(ukdata1[[category]] ~ Month, data = ukdata1, subset = !is.na(ukdata1[[category]]))
+})
+
+# Summarize the linear regression models
+summary_lm <- lapply(lm_models, summary)
+
+# Print the summaries
+for (i in seq_along(lm_models)) {
+  cat("Category:", names(ukdata1)[i + 1], "\n")
+  print(summary_lm[[i]])
+  cat("\n")
+}
+
+```
+
+**Overall Observations:**
+
+Month has a statistically significant positive influence on spending in all categories except "Delayable." The strength of this association varies, with "Work_Related" showing the strongest link and "Aggregate" having the weakest.
+
+1.  **Delayed category** - In regression graph shows month has very little influence on spending in this category according to this model. The coefficient for the month variable (1.030e-03) is very small and statistically insignificant (p-value = 0.8592). This suggests there's no statistically relevant linear relationship between month and spending in the "Delayable" category.
+
+2.  **Social category** - The multiple R-squared value (0.5305) indicates that the model explains over 53% of the variance in spending within the "Social" category. This suggests a moderately strong positive association between month and spending in this category. The month variable has a positive and statistically significant coefficient (3.774e-02; p-value \< 0.001). This suggests that spending and month have a positive linear connection. Put otherwise, monthly spending in the "Social" category tends to go up a little on average.
+
+3.  **Staple category** - The coefficient for the month variable (0.01495) is positive and statistically significant (p-value \< 0.001). This indicates that there's a positive linear relationship between month and spending. In other words, on average, spending in the "Staple" category tends to increase slightly with each month. The p-value for the month variable (5.116e-08) is highly significant, meaning we can reject the null hypothesis that there's no linear relationship between month and spending. We can confidently conclude that there's a statistically positive association.
+
+4.  **Work Related Category** - The model explains more than 68% of the variance in spending within the "Work_Related" category, according to the multiple R-squared value (0.6805). This implies that there is a significant positive correlation between the month and this category's spending. The coefficient for the month variable (5.332e-02) is positive and statistically significant (p-value \< 0.001). This indicates that there's a positive linear relationship between month and spending. The following could be the cause of the rise in work-related spending: Higher expenses as a result of increased business activity throughout the year. recurring costs associated with employment, such as software renewals or subscriptions, that occur all year long.
+
+```{r}
+
+# Convert 'Month' to Date
+ukdata1$Month <- as.Date(ukdata1$Month, format="%b %Y")
+
+# Create a list to store plots
+plots <- list()
+
+# Loop through each category and create a plot with the regression line
+for (category in names(ukdata1)[2:ncol(ukdata1)]) {
+  # Fit linear regression model
+  lm_model <- lm(ukdata1[[category]] ~ as.numeric(ukdata1$Month), data = ukdata1, subset = !is.na(ukdata1[[category]]))
+  
+  # Extract slope and intercept coefficients
+  slope <- coef(lm_model)[2]
+  intercept <- coef(lm_model)[1]
+  
+  # Plot original data points
+  plot <- ggplot(ukdata1, aes(x = as.numeric(Month), y = .data[[category]])) +  # Convert Month to numeric
+    geom_point() +
+    labs(title = paste("Regression Model for", category),
+         x = "Month", y = "Index Value") +
+    scale_x_continuous(breaks = as.numeric(ukdata1$Month), labels = format(ukdata1$Month, "%b %Y")) +  # Format Month labels
+    theme_minimal()
+  
+  # Add regression line to the plot
+  plot <- plot + geom_smooth(method = "lm", se = FALSE,
+                             aes(y = intercept + slope * as.numeric(Month)),
+                             color = "red")
+  
+  # Store the plot in the list
+  plots[[category]] <- plot
+}
+
+# Print the plots
+for (category in names(plots)) {
+  print(plots[[category]])
+}
+
+
+```
+
+## Conclusion
+
+By analyzing card spending data from the UK and Ireland, we found that consumers in both countries primarily use cards for food and groceries.
+
+There are significant seasonal effects on consumer spending behavior across different categories. Also effect of Covid-19 can seen seen in both countries in spending decrease in each category. For example, in Ireland, card spending for education increases in September, while card spending for clothing increases in December each year, likely due to the holiday season.
+
+In Ireland Spending by card in high in June-July period and decreased in December month. Reason behind that is people usually travel more in summer season as compared to winter season.
+
+In Ireland, consumers in County Dublin spend more on cards than those in County Cork and County Galway, respectively. This suggests a higher card penetration rate in Dublin's financial system compared to other counties.
+
+In UK consumer spend by Revolut card on Fuel significantly higher that clothing and social. Also in Uk consumers use more card for buying work related products than social and clothing. Spending in Clothing by card saw highest increase during December January period. Every year there is same trend for Clothing category.

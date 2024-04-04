@@ -1,0 +1,119 @@
+Generative AI promises to revolutionize every industry it touches — all that’s been needed is the technology to meet the challenge.
+
+NVIDIA founder and CEO Jensen Huang on Monday introduced that technology — the company’s new Blackwell computing platform — as he outlined the major advances that increased computing power can deliver for everything from software to services, robotics to medical technology and more.
+
+“Accelerated computing has reached the tipping point — general purpose computing has run out of steam,” Huang told more than 12,000 GTC attendees gathered in-person — and many tens of thousands more online — for his keynote address at Silicon Valley’s cavernous SAP Center arena.
+
+“We need another way of doing computing — so that we can continue to scale so that we can continue to drive down the cost of computing, so that we can continue to consume more and more computing while being sustainable. Accelerated computing is a dramatic speedup over general-purpose computing, in every single industry.”
+Huang spoke in front of massive images on a 40-foot tall, 8K screen the size of a tennis court to a crowd packed with CEOs and developers, AI enthusiasts and entrepreneurs, who walked together 20 minutes to the arena from the San Jose Convention Center on a dazzling spring day.
+
+Delivering a massive upgrade to the world’s AI infrastructure, Huang introduced the NVIDIA Blackwell platform to unleash real-time generative AI on trillion-parameter large language models.
+
+Huang presented NVIDIA NIM — a reference to NVIDIA inference microservices — a new way of packaging and delivering software that connects developers with hundreds of millions of GPUs to deploy custom AI of all kinds.
+
+And bringing AI into the physical world, Huang introduced Omniverse Cloud APIs to deliver advanced simulation capabilities.
+Huang punctuated these major announcements with powerful demos, partnerships with some of the world’s largest enterprises and more than a score of announcements detailing his vision.
+
+GTC — which in 15 years has grown from the confines of a local hotel ballroom to the world’s most important AI conference — is returning to a physical event for the first time in five years.
+
+This year’s has over 900 sessions — including a panel discussion on transformers moderated by Huang with the eight pioneers who first developed the technology, more than 300 exhibits and 20-plus technical workshops.
+
+It’s an event that’s at the intersection of AI and just about everything. In a stunning opening act to the keynote, Refik Anadol, the world’s leading AI artist, showed a massive real-time AI data sculpture with wave-like swirls in greens, blues, yellows and reds, crashing, twisting and unraveling across the screen.
+
+As he kicked off his talk, Huang explained that the rise of multi-modal AI — able to process diverse data types handled by different models — gives AI greater adaptability and power. By increasing their parameters, these models can handle more complex analyses.
+
+But this also means a significant rise in the need for computing power. And as these collaborative, multi-modal systems become more intricate — with as many as a trillion parameters — the demand for advanced computing infrastructure intensifies.
+
+“We need even larger models,” Huang said. “We’re going to train it with multimodality data, not just text on the internet, we’re going to train it on texts and images, graphs and charts, and just as we learned watching TV, there’s going to be a whole bunch of watching video.”
+
+The Next Generation of Accelerated Computing
+In short, Huang said “we need bigger GPUs.” The Blackwell platform is built to meet this challenge. Huang pulled a Blackwell chip out of his pocket and held it up side-by-side with a Hopper chip, which it dwarfed.
+
+Named for David Harold Blackwell — a University of California, Berkeley mathematician specializing in game theory and statistics, and the first Black scholar inducted into the National Academy of Sciences — the new architecture succeeds the NVIDIA Hopper architecture, launched two years ago.
+
+Blackwell delivers 2.5x its predecessor’s performance in FP8 for training, per chip, and 5x with FP4 for inference. It features a fifth-generation NVLink interconnect that’s twice as fast as Hopper and scales up to 576 GPUs.
+
+And the NVIDIA GB200 Grace Blackwell Superchip connects two Blackwell NVIDIA B200 Tensor Core GPUs to the NVIDIA Grace CPU over a 900GB/s ultra-low-power NVLink chip-to-chip interconnect.
+
+Huang held up a board with the system. “This computer is the first of its kind where this much computing fits into this small of a space,” Huang said. “Since this is memory coherent, they feel like it’s one big happy family working on one application together.”
+
+For the highest AI performance, GB200-powered systems can be connected with the NVIDIA Quantum-X800 InfiniBand and Spectrum-X800 Ethernet platforms, also announced today, which deliver advanced networking at speeds up to 800Gb/s.
+“The amount of energy we save, the amount of networking bandwidth we save, the amount of wasted time we save, will be tremendous,” Huang said. “The future is generative … which is why this is a brand new industry. The way we compute is fundamentally different. We created a processor for the generative AI era.”
+
+To scale up Blackwell, NVIDIA built a new chip called NVLink Switch. Each can connect four NVLink interconnects at 1.8 terabytes per second and eliminate traffic by doing in-network reduction.
+
+NVIDIA Switch and GB200 are key components of what Huang described as “one giant GPU,” the NVIDIA GB200 NVL72, a multi-node, liquid-cooled, rack-scale system that harnesses Blackwell to offer supercharged compute for trillion-parameter models, with 720 petaflops of AI training performance and 1.4 exaflops of AI inference performance in a single rack.
+
+“There are only a couple, maybe three exaflop machines on the planet as we speak,” Huang said of the machine, which packs 600,000 parts and weighs 3,000 pounds. “And so this is an exaflop AI system in one single rack. Well let’s take a look at the back of it.”
+
+Going even bigger, NVIDIA today also announced its next-generation AI supercomputer — the NVIDIA DGX SuperPOD powered by NVIDIA GB200 Grace Blackwell Superchips — for processing trillion-parameter models with constant uptime for superscale generative AI training and inference workloads.
+
+Featuring a new, highly efficient, liquid-cooled rack-scale architecture, the new DGX SuperPOD is built with NVIDIA DG GB200 systems and provides 11.5 exaflops of AI supercomputing at FP4 precision and 240 terabytes of fast memory — scaling to more with additional racks.
+
+“In the future, data centers are going to be thought of … as AI factories,” Huang said. “Their goal in life is to generate revenues, in this case, intelligence.”
+
+The industry has already embraced Blackwell.
+
+The press release announcing Blackwell includes endorsements from Alphabet and Google CEO Sundar Pichai, Amazon CEO Andy Jassy, Dell CEO Michael Dell, Google DeepMind CEO Demis Hassabis, Meta CEO Mark Zuckerberg, Microsoft CEO Satya Nadella, OpenAI CEO Sam Altman, Oracle Chairman Larry Ellison, and Tesla and xAI CEO Elon Musk.
+
+Blackwell is being adopted by every major global cloud services provider,  pioneering AI companies, system and server vendors, and regional cloud service providers and telcos all around the world.
+
+“The whole industry is gearing up for Blackwell,” which Huang said would be the most successful launch in the company’s history.
+
+A New Way to Create Software
+Generative AI changes the way applications are written, Huang said.
+
+Rather than writing software, he explained, companies will assemble AI models, give them missions, give examples of work products, review plans and intermediate results.
+
+These packages — NVIDIA NIMs — are built from NVIDIA’s accelerated computing libraries and generative AI models, Huang explained.
+
+“How do we build software in the future? It is unlikely that you’ll write it from scratch or write a whole bunch of Python code or anything like that,” Huang said. “It is very likely that you assemble a team of AIs.”
+
+The microservices support industry-standard APIs so they are easy to connect, work across NVIDIA’s large CUDA installed base, are re-optimized for new GPUs, and are constantly scanned for security vulnerabilities and exposures.
+
+Huang said customers can use NIM microservices off the shelf, or NVIDIA can help build proprietary AI and copilots, teaching a model specialized skills only a specific company would know to create invaluable new services.
+
+“The enterprise IT industry is sitting on a goldmine,” Huang said. “They have all these amazing tools (and data) that have been created over the years. If they could take that goldmine and turn it into copilots, these copilots can help us do things.”
+
+Major tech players are already putting it to work. Huang detailed how NVIDIA is already helping Cohesity, NetApp, SAP, ServiceNow and Snowflake build copilots and virtual assistants. And industries are stepping in, as well.
+
+In telecom, Huang announced the NVIDIA 6G Research Cloud, a generative AI and Omniverse-powered platform to advance the next communications era. It’s built with NVIDIA’s Sionna neural radio framework, NVIDIA Aerial CUDA-accelerated radio access network and the NVIDIA Aerial Omniverse Digital Twin for 6G.
+
+In semiconductor design and manufacturing, Huang announced that, in collaboration with TSMC and Synopsys, NVIDIA is bringing its breakthrough computational lithography platform, cuLitho, to production. This platform will accelerate the most compute-intensive workload in semiconductor manufacturing by 40-60x.
+
+Huang also announced the NVIDIA Earth Climate Digital Twin. The cloud platform — available now — enables interactive, high-resolution simulation to accelerate climate and weather prediction.
+
+The greatest impact of AI will be in healthcare, Huang said, explaining that NVIDIA is already in imaging systems, in gene sequencing instruments and working with leading surgical robotics companies.
+
+NVIDIA is launching a new type of biology software. NVIDIA today launched more than two dozen new microservices that allow healthcare enterprises worldwide to take advantage of the latest advances in generative AI from anywhere and on any cloud. They offer advanced imaging, natural language and speech recognition, and digital biology generation, prediction and simulation.
+
+Omniverse Brings AI to the Physical World
+The next wave of AI will be AI learning about the physical world, Huang said.
+
+“We need a simulation engine that represents the world digitally for the robot so that the robot has a gym to go learn how to be a robot,” he said. “We call that virtual world Omniverse.”
+
+That’s why NVIDIA today announced that NVIDIA Omniverse Cloud will be available as APIs, extending the reach of the world’s leading platform for creating industrial digital twin applications and workflows across the entire ecosystem of software makers.
+
+The five new Omniverse Cloud application programming interfaces enable developers to easily integrate core Omniverse technologies directly into existing design and automation software applications for digital twins, or their simulation workflows for testing and validating autonomous machines like robots or self-driving vehicles.
+
+To show how this works, Huang shared a demo of a robotic warehouse — using multi-camera perception and tracking — watching over workers and orchestrating robotic forklifts, which are driving autonomously with the full robotic stack running.
+
+Huang also announced that NVIDIA is bringing Omniverse to Apple Vision Pro, with the new Omniverse Cloud APIs letting developers stream interactive industrial digital twins into the VR headsets.
+Some of the world’s largest industrial software makers are embracing Omniverse Cloud APIs, including Ansys, Cadence, Dassault Systèmes for its 3DEXCITE brand, Hexagon, Microsoft, Rockwell Automation, Siemens and Trimble.
+
+Robotics
+Everything that moves will be robotic, Huang said. The automotive industry will be a big part of that. NVIDIA computers are already in cars, trucks, delivery bots and robotaxis.
+
+Huang announced that BYD, the world’s largest autonomous vehicle company, has selected NVIDIA’s next-generation computer for its AV, building its next-generation EV fleets on DRIVE Thor.
+
+To help robots better see their environment, Huang also announced the Isaac Perceptor software development kit with state-of-the-art multi-camera visual odometry, 3D reconstruction and occupancy map, and depth perception.
+
+And to help make manipulators, or robotic arms, more adaptable, NVIDIA is announcing Isaac Manipulator — a state-of-the-art robotic arm perception, path planning and kinematic control library.
+
+Finally, Huang announced Project GR00T, a general-purpose foundation model for humanoid robots, designed to further the company’s work driving breakthroughs in robotics and embodied AI.
+
+Supporting that effort, Huang unveiled a new computer, Jetson Thor, for humanoid robots based on the NVIDIA Thor system-on-a-chip and significant upgrades to the NVIDIA Isaac robotics platform.
+
+In his closing minutes, Huang brought on stage a pair of diminutive NVIDIA-powered robots from Disney Research.
+
+“The soul of NVIDIA — the intersection of computer graphics, physics, artificial intelligence,” he said. “It all came to bear at this moment.”
