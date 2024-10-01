@@ -1,4 +1,3 @@
-# assignment3
-Assignment 3 of Applied Analytics in Business and Society
+# Revolut card data Vs Bank of England Card data analysis 
 By - Amandeep Manchanda
-ID - 23104862
+Data Source Bank of England
